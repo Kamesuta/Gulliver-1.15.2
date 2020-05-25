@@ -3,6 +3,7 @@ package com.artemis.artemislib.attributes;
 import com.artemis.artemislib.compatibilities.sizeCap.ISizeCap;
 import com.artemis.artemislib.compatibilities.sizeCap.SizeCapPro;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
@@ -19,6 +20,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.teamfruit.gulliver.event.EntitySizeEvent;
 
 public class AttributesHandler {
     @SubscribeEvent
@@ -30,6 +32,47 @@ public class AttributesHandler {
             map.registerAttribute(Attributes.ENTITY_HEIGHT);
             map.registerAttribute(Attributes.ENTITY_WIDTH);
         }
+    }
+
+    @SubscribeEvent
+    public void onEntityGetSize(EntitySizeEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity))
+            return;
+        final LivingEntity entity = (LivingEntity) event.getEntity();
+
+        LazyOptional<ISizeCap> lazyCap = entity.getCapability(SizeCapPro.sizeCapability);
+        lazyCap.ifPresent(cap -> {
+            final boolean hasHeightModifier = entity.getAttribute(Attributes.ENTITY_HEIGHT).func_225505_c_().isEmpty();
+            final boolean hasWidthModifier = entity.getAttribute(Attributes.ENTITY_WIDTH).func_225505_c_().isEmpty();
+
+            final double heightAttribute = entity.getAttribute(Attributes.ENTITY_HEIGHT).getValue();
+            final double widthAttribute = entity.getAttribute(Attributes.ENTITY_WIDTH).getValue();
+
+            final EntitySize oldSize = event.getOldSize();
+            float height = (float) (oldSize.height * heightAttribute);
+            float width = (float) (oldSize.width * widthAttribute);
+
+            /* Makes Sure to only Run the Code IF the Entity Has Modifiers */
+            if (hasHeightModifier != true || hasWidthModifier != true) {
+                /* If the Entity Does have a Modifier get it's size before changing it's size */
+                if (!cap.getTrans()) {
+                    cap.setDefaultHeight(oldSize.height);
+                    cap.setDefaultWidth(oldSize.width);
+                    cap.setTrans(true);
+                } else {
+                    /* Handles Resizing while true */
+                    width = MathHelper.clamp(width, 0.15F, width);
+                    height = MathHelper.clamp(height, 0.25F, height);
+                    event.setNewSize(EntitySize.flexible(width, height));
+                }
+            } else /* If the Entity Does not have any Modifiers */ {
+                /* Returned the Entities Size Back to Normal */
+                if (cap.getTrans()) {
+                    event.setNewSize(oldSize);
+                    cap.setTrans(false);
+                }
+            }
+        });
     }
 
     @SubscribeEvent
