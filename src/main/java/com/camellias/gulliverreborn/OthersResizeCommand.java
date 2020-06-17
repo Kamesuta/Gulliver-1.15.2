@@ -12,6 +12,8 @@ import com.google.common.collect.Multimap;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -101,8 +103,8 @@ public class OthersResizeCommand extends CommandBase
 			return;
 		}
 		
-		EntityPlayer player = getPlayer(server, sender, args[0]);
-		
+		List<Entity> entities = getEntityList(server, sender, args[0]);
+
 		size = MathHelper.clamp(size, 0.125F, Config.MAX_SIZE);
 		Multimap<String, AttributeModifier> attributes = HashMultimap.create();
 		Multimap<String, AttributeModifier> removeableAttributes = HashMultimap.create();
@@ -134,10 +136,15 @@ public class OthersResizeCommand extends CommandBase
 		{
 			((EntityPlayer) sender).getAttributeMap().removeAttributeModifiers(removeableAttributes2);
 		}
-		
-		player.getAttributeMap().applyAttributeModifiers(attributes);
-		player.setHealth(player.getMaxHealth());
-		
-		if(sender instanceof EntityPlayer) GulliverReborn.LOGGER.info(((EntityPlayer) sender).getDisplayNameString() + " set " + player.getDisplayNameString() +"'s size to " + size);
+
+		for (Entity entity : entities) {
+			if (entity instanceof EntityLiving) {
+				EntityLiving living = (EntityLiving) entity;
+				living.getAttributeMap().applyAttributeModifiers(attributes);
+				living.setHealth(living.getMaxHealth());
+
+				if(sender instanceof EntityPlayer) GulliverReborn.LOGGER.info(((EntityPlayer) sender).getDisplayNameString() + " set " + living.getDisplayName() +"'s size to " + size);
+			}
+		}
 	}
 }

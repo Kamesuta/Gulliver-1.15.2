@@ -12,9 +12,9 @@ buildscript
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0"
-group = "com.yourname.modid"
-archivesBaseName = "modid"
+version = "1.12.2-1.0.0"
+group = "net.teamfruit"
+archivesBaseName = "gulliver-reborn-mob"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava
