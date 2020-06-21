@@ -11,7 +11,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle'
 
-version = "1.12.2-1.0.0"
+version = "1.12.2-1.1.0"
 group = "net.teamfruit"
 archivesBaseName = "gulliver-reborn-mob"
 
@@ -72,6 +72,9 @@ repositories
     {
         url = "https://minecraft.curseforge.com/api/maven/"
     }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -99,6 +102,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     compile 'artemislib:ArtemisLib:1.12.2:v1.0.6'
+    // implementation fg.deobf('metamorph:metamorph:1.1.10:1.12.2')
+    // implementation fg.deobf('mchorses-mclib:mclib:1.0.4:1.12.2')
+    implementation name: 'mclib-1.0.4-1.12.2-deobf'
+    implementation name: 'metamorph-1.1.10-1.12.2-deobf'
 }
 
 jar.finalizedBy('reobfJar')
