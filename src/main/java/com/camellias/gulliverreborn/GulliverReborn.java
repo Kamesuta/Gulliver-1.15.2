@@ -3,6 +3,7 @@ package com.camellias.gulliverreborn;
 import com.artemis.artemislib.compatibilities.sizeCap.ISizeCap;
 import com.artemis.artemislib.compatibilities.sizeCap.SizeCapPro;
 import com.artemis.artemislib.util.attributes.ArtemisLibAttributes;
+import com.google.common.base.Predicates;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import mchorse.metamorph.api.morphs.AbstractMorph;
@@ -369,6 +370,7 @@ public class GulliverReborn {
                 attributes.put(EntityPlayer.REACH_DISTANCE.getName(), entity.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getModifier(uuidReach2));
                 attributes.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(uuidStrength));
                 attributes.put(SharedMonsterAttributes.MAX_HEALTH.getName(), entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getModifier(uuidHealth));
+                attributes.values().removeIf(Predicates.isNull());
                 living.getAttributeMap().applyAttributeModifiers(attributes);
             }
 
